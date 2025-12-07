@@ -1,0 +1,89 @@
+program MasterTest;
+var
+    # Variables Globales
+    x, y, contador : int;
+    f : float;
+    status : string;
+
+# FUNCION 1: Prueba de Scope y Aritmetica Mixta
+# Recibe un entero, pero adentro trabaja con flotantes
+void pruebaScope(x : int) [
+    var
+        f : float; # Conflicto de nombre con global 'f'
+    {
+        # Aqui 'f' es local. No debe afectar a la global.
+        f = x * 2.5 + 10; 
+        print("   [Scope] Local f (debe ser ", x, "*2.5+10): ", f);
+        
+        if (f > 50.0) {
+            print("   [Logic] El valor local es grande");
+        } else {
+            print("   [Logic] El valor local es chico");
+        };
+    }
+];
+
+# FUNCION 2: Recursividad + Ciclos
+void recursionCiclica(n : int) [
+    var 
+        temp : int;
+    {
+        print("   [Rec] Nivel: ", n);
+        
+        # Un ciclo innecesario solo para molestar a la memoria
+        temp = 0;
+        do {
+            temp = temp + 1;
+        } while (temp < 2);
+
+        if (n > 1) {
+            recursionCiclica(n - 1);
+        } else {
+            print("   [Rec] Base alcanzada!");
+        };
+    }
+];
+
+main {
+
+    # 1. Inicializacion
+    x = 10;
+    f = 99.9; # Global f
+    status = "Iniciando...";
+    print("Estado: ", status);
+
+    # 2. Aritmetica Pesada (Precedencia)
+    # 10 + (5 * 2) - (4 / 2) = 10 + 10 - 2 = 18
+    y = x + 5 * 2 - 4 / 2;
+    print("1. Aritmetica (Debe ser 18): ", y);
+
+    # 3. Llamada con Shadowing
+    print("2. Prueba de Scope (Global f es 99.9):");
+    # Pasamos 20. Local f sera: 20 * 2.5 + 10 = 60.0
+    pruebaScope(20); 
+    print("   [Main] Global f sigue siendo: ", f);
+
+    # 4. Ciclo Do-While con If Anidado
+    print("3. Ciclo complejo:");
+    contador = 0;
+    do {
+        contador = contador + 1;
+        
+        if (contador == 2) {
+            print("   Iteracion 2: Llamando recursion...");
+            recursionCiclica(3);
+        } else {
+            print("   Iteracion ", contador, ": Normal");
+        };
+
+    } while (contador < 3);
+
+    # 5. Comparacion Final
+    if (f == 99.9) {
+        print("--- EXITO: MEMORIA INTACTA ---");
+    } else {
+        print("--- FALLO: MEMORIA CORRUPTA ---");
+    };
+}
+end
+
